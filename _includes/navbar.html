@@ -1,61 +1,52 @@
-<nav class="navbar navbar-expand-lg navbar-light">
-
-  <a class="navbar-brand" href="{{ site.baseurl }}/"><h5><b>{{ site.title }}</b></h5></a>
-
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-
-  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-    <div class="navbar-nav ml-auto">
-
-      {%- assign html_pages = site.html_pages | sort: 'weight' -%}
-      {%- assign filtered_pages = "" | split: "" -%}
-
-      {%- for html_page in html_pages -%} 
-
-        {%- assign exclude = false -%}
-
-        {%- for exclude_path in site.nav_exclude -%}
-
-          {%- if exclude_path == html_page.path -%}
-            {%- assign exclude = true -%}
-            {%- break -%}
-          {%- elsif exclude_path contains '**' -%}
-            {%- assign match = exclude_path | remove: '**' -%}
-            {%- if html_page.path contains match -%}
-              {%- assign exclude = true -%}
-              {%- break -%}
-            {%- endif -%}
-          {%- endif -%}
-
-        {%- endfor -%}
-
-        {%- unless exclude -%}
-          {%- assign filtered_pages = filtered_pages | push: html_page -%}
-        {%- endunless -%}
-
-      {%- endfor -%}
-
-      {% for html_page in filtered_pages %}  
-
-        {%- if page.url contains html_page.url -%}
-          {%- assign active_status = "active" -%}
-        {%- else -%}
-          {%- assign active_status = "" -%}
-        {%- endif -%}
-
-        {%- if html_page.external_url -%}
-          {%- assign url = html_page.external_url -%}
-        {%- else -%}
-          {%- assign url = html_page.url | relative_url -%}
-        {%- endif -%}
-
-        <a class="nav-item nav-link {{ active_status }}" href="{{ url }}">{{ html_page.title }}</a>
-
-      {% endfor %}
-
+<nav class="navbar navbar-default navbar-fixed-top navbar-custom">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#main-navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
     </div>
-  </div>
 
+    <div class="collapse navbar-collapse" id="main-navbar">
+      <ul class="nav navbar-nav">
+      {%- for link in site.navbar-links -%}
+        {%- if link[1].first %}
+          <li class="navlinks-container">
+            <a class="navlinks-parent" href="javascript:void(0)">{{ link[0] }}</a>
+            <div class="navlinks-children">
+              {%- for childlink in link[1] -%}
+              {%- for linkparts in childlink %}
+              <a href="{{ linkparts[1] | relative_url }}">{{ linkparts[0] }}</a>
+              {%- endfor -%}
+              {%- endfor %}
+            </div>
+          </li>
+        {% else %}
+          <li><a href="{{ link[1] | relative_url }}">{{ link[0] }}</a></li>
+        {%- endif -%}
+      {%- endfor -%}
+      </ul>
+    </div>
+
+	{% if page.image and (layout.show-avatar or page.show-avatar) %}
+	<div class="avatar-container">
+	  <div class="avatar-img-border">
+	    <a href="{{ '' | absolute_url }}">
+	      <img class="avatar-img" src="{{ page.image | relative_url }}" />
+		</a>
+	  </div>
+	</div>
+	{% elsif site.avatar and (layout.show-avatar or page.show-avatar) %}
+	<div class="avatar-container">
+	  <div class="avatar-img-border">
+	    <a href="{{ '' | absolute_url }}">
+	      <img class="avatar-img" src="{{ site.avatar | relative_url }}" />
+		</a>
+	  </div>
+	</div>
+	{% endif %}
+
+  </div>
 </nav>
